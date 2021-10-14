@@ -1,4 +1,4 @@
-# SyncNewAutoPilotComputersandUsersToAAD.ps1
+# SyncNewAutoPilotComputersToAAD.ps1
 #
 # Version 1.3
 #
@@ -29,15 +29,14 @@ If ($computers -ne $null) {
             # The below adds to AD groups automatically if you want
             #Add-ADGroupMember -Identity "Some Intune Co-management Pilot Device Group" -Members $computer
             #Logging
-            $dest = "$($env:ProgramData)\Dell\SyncNewAutopilotComputersandUsersToAAD"
+            $dest = "$($env:ProgramData)\SyncNewAutopilotComputersToAAD"
             if (-not (Test-Path $dest))
             {
                 mkdir $dest
             }
-            Start-Transcript "$dest\SyncNewAutopilotComputersandUsersToAAD.log" -Append
+            Start-Transcript "$dest\SyncNewAutopilotComputersToAAD.log" -Append
 
             Write-Host "Valid computer found (<24hrs old, modified in the last 5 minutes, and has userCertificate): $computer"
-            Stop-Transcript
             $syncComputers = "True"
         }
     }
@@ -47,6 +46,15 @@ If ($computers -ne $null) {
 
 If ($syncComputers -ne $null){
     Write-Host "Syncing computers"
-    Try { Start-ADSyncSyncCycle -PolicyType Delta }
-    Catch {}
+    Try {
+        $startAD = Start-ADSyncSyncCycle -PolicyType Delta
+        Write-Host "Result:"$startAD.Result
+    }
+    Catch {
+        Write-Host "Error starting sync"
+        $ErrorMessage = $_.Exception.Message
+        Write-Host "Error message: $ErrorMessage"
+    }
+    Stop-Transcript
+
 }else{Write-Host "No new computers to sync"}
