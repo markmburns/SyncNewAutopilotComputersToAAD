@@ -2,8 +2,7 @@
 #
 # Version 1.3
 #
-# Stolen from Alex Durrant. Updated by Steve Prentice, 2020
-# Logging and tweaks by mark_burns@dell.com
+# Alex Durrant, Steve Prentice, Mark Burns
 #
 # Triggers an ADDConnect Delta Sync if new objects are found to be have been created
 # in the OU's in question, this is helpful with Hybrid AD joined devices via Autopilot
@@ -20,7 +19,6 @@ Import-Module ActiveDirectory
 
 $time = [DateTime]::Now.AddMinutes(-5)
 $computers = Get-ADComputer -Filter 'Modified -ge $time' -SearchBase "OU=Autopilot Hybrids,DC=mmbb,DC=local" -Properties Created, Modified, userCertificate
-#$users = Get-ADUser -Filter 'Created -ge $time' -SearchBase "OU=W10Users,OU=Users,DC=somedomain,local=com" -Properties Created
 
 If ($computers -ne $null) {
     ForEach ($computer in $computers) {
